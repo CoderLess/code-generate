@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Document</title>
+        <script src="./js/vue.js"></script>
+        <script src="./js/vue-router.js"></script>
+        <script src="./js/vue-resource.js"></script>
+        <link rel="stylesheet" href="./css/bootstrap.css">
+    </head>
+
+    <body>
+        <div id="app">
+
+            <transition>
+                <router-view></router-view>
+            </transition>
+        </div>
+        <!--    链接信息-->
+        <template id="connictionInfo">
+            <div class="container">
+                <div class="form-group">
+                    <!-- 驱动类-->
+                    <label>DriverClass</label>
+                    <select class="form-control" v-model="driverClass" @change="change">
+                        <!-- 注意：这里的value要加上v-bind-->
+                        <option v-for="item in databaseInfoList" :key="item.index" :value="item.index">
+                            {{item.driverClass}}
+                        </option>
+                    </select>
+                    <!-- 链接-->
+                    <label>ConnectionURL</label>
+                    <input type="text" class="form-control" v-model="connectionURL">
+                    <!-- 用户名-->
+                    <label>username</label>
+                    <input type="text" class="form-control" v-model="username">
+                    <!-- 密码-->
+                    <label>password</label>
+                    <input type="text" class="form-control" v-model="password">
+                    <input type="button" value="下一步" @click="next" class="btn btn-primary">
+                </div>
+            </div>
+        </template>
+        <script>
+            var connetionInfo = {
+                template: '#connictionInfo',
+                data: function () {
+                    return {
+                        driverClass: 0,
+                        connectionURL: '',
+                        username: '',
+                        password: '',
+                        databaseInfoList: []
+                    }
+                },
+                methods: {
+                    change() {
+                        let element =this.databaseInfoList.find((element) => (element.index == this.driverClass))
+                        if(element) {
+                            this.connectionURL = element.connectionURL
+                        }
+                    },
+                    next() {
+                        this.$http.post('/database/connection',{driverClass: this.driverClass,
+                            connectionURL: this.connectionURL,
+                            username: this.username,
+                            password: this.password}).then((data) =>{
+                            console.log(data)
+                        })
+                    }
+                },
+                created: function () {
+                    this.$http.get('/database/allType').then((data) => {
+                        this.databaseInfoList = data.body.data
+                        this.change()
+                    })
+                },
+            }
+            var router = new VueRouter({
+                routes: [
+                    {path: '/', redirect: 'connectionInfo'},
+                    {path: '/connectionInfo', component: connetionInfo}
+                ]
+            })
+            var vm = new Vue({
+                el: '#app',
+                data: {},
+                methods: {},
+                router
+            });
+        </script>
+    </body>
+
+</html>
