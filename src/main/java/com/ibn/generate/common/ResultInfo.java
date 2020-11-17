@@ -27,7 +27,7 @@ public class ResultInfo {
      * @param data
      * @return
      */
-    public ResultInfo fail(Object data) {
+    public ResultInfo error(Object data) {
         this.status=HttpStatus.INTERNAL_SERVER_ERROR.value();
         this.data = data;
         return this;

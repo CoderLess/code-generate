@@ -8,7 +8,7 @@ import java.util.Map;
 
 public enum DataBaseInfoEnum {
 
-    MYSQL(0,"com.mysql.cj.jdbc.Driver", "jdbc:mysql://192.168.0.238:3306/ibn_rms?useUnicode=true&characterEncoding=UTF-8&useSSL=false"),
+    MYSQL(0,"com.mysql.cj.jdbc.Driver", "jdbc:mysql://8.131.95.28/lz_crm?useUnicode=true&characterEncoding=UTF-8&useSSL=false"),
     ORACLE(1,"oracle.jdbc.driver.OracleDriver", "jdbc:oracle:thin:@localhost:1521:gfs");
 
     private Integer index;
@@ -31,6 +31,18 @@ public enum DataBaseInfoEnum {
             list.add(map);
         }
         return list;
+    }
+
+    public static DataBaseInfoEnum getValue(Integer type) {
+        if (null == type) {
+            return null;
+        }
+        for (DataBaseInfoEnum dataBaseInfoEnum : DataBaseInfoEnum.values()) {
+            if (type.equals(dataBaseInfoEnum.getIndex())) {
+                return dataBaseInfoEnum;
+            }
+        }
+        return null;
     }
 
     public String getDriverClass() {

@@ -4,7 +4,8 @@ import lombok.Data;
 
 @Data
 public class ConnectionDO {
-    private String driverClass;
+    private Long id;
+    private Integer driverClass;
     private String connectionURL;
     private String username;
     private String password;

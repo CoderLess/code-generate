@@ -55,7 +55,19 @@
             <artifactId>guava</artifactId>
             <version>23.0</version>
         </dependency>
-<!--        <dependency>-->
+        <!-- 连接池  -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid-spring-boot-starter</artifactId>
+            <version>1.1.10</version>
+        </dependency>
+        <!--主从配置依赖-->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
+            <version>3.2.1</version>
+        </dependency>
+        <!--        <dependency>-->
 <!--            <groupId>com.alibaba</groupId>-->
 <!--            <artifactId>fastjson</artifactId>-->
 <!--            <version>1.2.75</version>-->
