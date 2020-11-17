@@ -1,6 +1,7 @@
 package com.ibn.generate.dao;
 
 import com.ibn.generate.entity.DatabaseDO;
+import com.ibn.generate.entity.TableDO;
 
 import java.util.List;
 
@@ -15,4 +16,6 @@ import java.util.List;
 public interface MysqlQueryDao {
 
     List<DatabaseDO> queryDatabaseInfo();
+
+    List<TableDO> queryTableList(String schemaName);
 }

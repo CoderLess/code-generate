@@ -2,6 +2,7 @@ package com.ibn.generate.service.impl;
 
 import com.ibn.generate.dao.MysqlQueryDao;
 import com.ibn.generate.entity.DatabaseDO;
+import com.ibn.generate.entity.TableDO;
 import com.ibn.generate.service.QueryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,5 +24,10 @@ public class MysqlQueryServiceImpl implements QueryService {
     @Override
     public List<DatabaseDO> queryDataBaseName() {
         return mysqlQueryDao.queryDatabaseInfo();
+    }
+
+    @Override
+    public List<TableDO> queryTableList(String schemaName) {
+        return mysqlQueryDao.queryTableList(schemaName);
     }
 }
