@@ -27,15 +27,9 @@ public final class SpringUtils implements ApplicationContextAware {
         }
     }
 
-    public static <T> T getBean(Class<T> clazz) {
-        return SpringUtils.applicationContext.getBean(clazz);
-    }
 
     public static Object getBean(String name) {
         return SpringUtils.applicationContext.getBean(name);
     }
 
-    public static String getProperty(String key) {
-        return SpringUtils.applicationContext.getEnvironment().getProperty(key);
-    }
 }

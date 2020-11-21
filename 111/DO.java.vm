@@ -1,0 +1,27 @@
+package ${sysConfig.basepackage}.${velocityConfig.template.do.outPutPackage};
+
+import com.ibn.entity.BaseDO;
+import lombok.Data;
+
+/**
+ * @version 1.0
+ * @description: ${table.remark} do
+ * @projectName：${projectName}
+ * @see: ${sysConfig.basepackage}.${velocityConfig.template.do.outPutPackage}
+ * @author： ${author}
+ * @createTime：${curTime}
+ */
+@Data
+public class ${table.entityName}DO extends BaseDO {
+
+	private static final long serialVersionUID = 1L;
+
+    #foreach($fileld in ${table.fieldDOList})
+    /**
+     * @description: $fileld.remark
+     * @author：${author}
+     * @createTime：${curTime}
+     */
+    private $fileld.attributeType $fileld.parameterName;
+    #end
+}

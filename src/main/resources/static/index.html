@@ -1,213 +1,382 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>Document</title>
-        <script src="./js/vue.js"></script>
-        <script src="./js/vue-router.js"></script>
-        <script src="./js/vue-resource.js"></script>
-        <link rel="stylesheet" href="./css/bootstrap.css">
-        <style>
-            .v-enter, .v-leave-to {
-                opacity: 0;
-                transform: translateX(500px);
-            }
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="./js/vue.js"></script>
+    <script src="./js/vue-router.js"></script>
+    <script src="./js/vue-resource.js"></script>
+    <link rel="stylesheet" href="./css/bootstrap.css">
+    <style>
+        .v-enter,
+        .v-leave-to {
+            opacity: 0;
+            transform: translateX(500px);
+        }
 
-            .v-enter-active, .v-leave-active {
-                transition: all .5s ease;
-            }
+        .v-enter-active,
+        .v-leave-active {
+            transition: all .5s ease;
+        }
 
-            .text-line {
-                line-height: 35px;
-                padding-left: 10px;
-            }
-        </style>
-    </head>
+        .text-line {
+            line-height: 35px;
+            padding-left: 10px;
+        }
+    </style>
+</head>
 
-    <body>
-        <div id="app">
-            <div class="container">
-                <transition appear mode="out-in">
-                    <router-view></router-view>
-                </transition>
+<body>
+    <div id="app">
+        <div class="container">
+            <transition appear mode="out-in">
+                <router-view></router-view>
+            </transition>
+        </div>
+    </div>
+    <!--    链接信息-->
+    <template id="connictionInfo">
+
+        <div class="form-group" @keyup.enter="next">
+            <!-- 驱动类-->
+            <label>DriverClass</label>
+            <select class="form-control" v-model="driverClass" @change="change">
+                <!-- 注意：这里的value要加上v-bind-->
+                <option v-for="item in databaseInfoList" :key="item.index" :value="item.index">
+                    {{item.driverClass}}
+                </option>
+            </select>
+            <!-- 链接-->
+            <label>ConnectionURL</label>
+            <input type="text" class="form-control" v-model="connectionURL">
+            <!-- 用户名-->
+            <label>username</label>
+            <input type="text" class="form-control" v-model="username">
+            <!-- 密码-->
+            <label>password</label>
+            <input type="text" class="form-control" v-model="password">
+            <input type="button" value="下一步" @click="next" class="btn btn-primary">
+            <label ref="errormsg" style="color: red"></label>
+        </div>
+    </template>
+    <!--        选择数据库-->
+    <template id="schemaList">
+        <div class="select-container">
+            <div class="alert alert-danger" ref="tips" role="alert"></div>
+            <div class="form-group">
+                <p v-for="item in databaseList" class="text-line bg-primary" @click="showtable(item.schemaName)"
+                    :key="item.schemaName">{{item.schemaName}}</p>
             </div>
         </div>
-        <!--    链接信息-->
-        <template id="connictionInfo">
-
-            <div class="form-group" @keyup.enter="next">
-                <!-- 驱动类-->
-                <label>DriverClass</label>
-                <select class="form-control" v-model="driverClass" @change="change">
-                    <!-- 注意：这里的value要加上v-bind-->
-                    <option v-for="item in databaseInfoList" :key="item.index" :value="item.index">
-                        {{item.driverClass}}
-                    </option>
-                </select>
-                <!-- 链接-->
-                <label>ConnectionURL</label>
-                <input type="text" class="form-control" v-model="connectionURL">
-                <!-- 用户名-->
-                <label>username</label>
-                <input type="text" class="form-control" v-model="username">
-                <!-- 密码-->
-                <label>password</label>
-                <input type="text" class="form-control" v-model="password">
-                <input type="button" value="下一步" @click="next" class="btn btn-primary">
-                <label ref="errormsg" style="color: red"></label>
-            </div>
-        </template>
-        <!--        选择数据库-->
-        <template id="schemaList">
-            <div class="select-container">
-                <div class="form-group">
-                    <p v-for="item in databaseList" class="text-line bg-primary" @click="showtable(item.schemaName)"
-                       :key="item.schemaName">{{item.schemaName}}</p>
-                </div>
-            </div>
-        </template>
-        <!--      获取所有的表信息  -->
-        <template id="tableList">
-            <div class="table-container">
-                <div class="row">
-                    <div class="col-md-6">
-                        <ul class="list-group">
-                            <li class="list-group-item" v-for="item in tableList" :key="item.tableName" @click="select(item.tableName)">{{item.tableName}}</li>
-                        </ul>
+    </template>
+    <!--      获取所有的表信息  -->
+    <template id="tableList">
+        <div class="table-container">
+            <div class="alert alert-danger" ref="tips"></div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">可选择</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="form-inline">
+                                <label>根据表名查询：</label>
+                                <input class="form-control" type="text" v-model="key">
+                            </div>
+                            <ul class="list-group">
+                                <li class="list-group-item" v-for="item in search(key)" :key="item.tableName"
+                                    @click="select(item.tableName)">{{item.tableName}}</li>
+                            </ul>
+                        </div>
                     </div>
-                    <div class="col-md-6">
-                        <ul class="list-group">
-                            <li class="list-group-item" v-for="item in selectedList" :key="item.tableName"  @click="back(item.tableName)">{{item.tableName}}</li>
-                        </ul>
+                </div>
+                <div class="col-md-6">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                已选择
+                                <input type="button" class="btn btn-info" value="下一步" @click="next">
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+                            <ul class="list-group">
+                                <li class="list-group-item" v-for="item in selectedList" :key="item.tableName"
+                                    @click="back(item.tableName)">{{item.tableName}}</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
-        </template>
-        <script>
-            var connetionInfo = {
-                template: '#connictionInfo',
-                data: function () {
-                    return {
-                        driverClass: 0,
-                        connectionURL: '',
-                        username: 'root',
-                        password: '123456',
-                        databaseInfoList: []
+        </div>
+    </template>
+    <!--  设置配置信息 -->
+    <template id="config">
+        <div class="config-container">
+            <div class="panel panel-default">
+                <div class="panel-heading">模板相关参数</div>
+                <div class="panel-body">
+                    <div v-show="error" class="alert alert-danger" ref="tips"></div>
+                    <!-- 包基础路径 -->
+                    <div id="form-group form-inline">
+                        <label class="control-label">基础包路径</label>
+                        <input type="text" v-model="basePackage">
+                    </div>
+                    <!-- 项目名称相关操作 -->
+                    <div class="form-group form-inline">
+                        <label class="control-label">项目名称：</label>
+                        <select class="form-control" v-model="projectName">
+                            <option v-for="item in projectList" :key="item">{{item}}</option>
+                        </select>
+                        <a href="#" @click.prevent="create">新建</a>
+                        <div v-show="show">
+                            <input type="text" v-model="newProjectName">
+                            <input type="button" class="btn btn-primary" value="添加" @click="add">
+                            <input type="button" class="btn btn-primary" value="取消" @click="show=false">
+                        </div>
+                    </div>
+                    <!-- 项目中的所有文件设置 -->
+                    <div id="form-group form-inline">
+                        <label class="control-label">模板设置：</label>
+                        <table class="table table-striped">
+                            <tr v-for="item in fileList">
+                                <td>{{item.templateFileName}}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+    <script>
+        var id = localStorage.getItem('id')
+        var connetionInfo = {
+            template: '#connictionInfo',
+            data: function () {
+                return {
+                    driverClass: 0,
+                    connectionURL: '',
+                    username: 'root',
+                    password: '123456',
+                    databaseInfoList: []
+                }
+            },
+            methods: {
+                change() {
+                    let element = this.databaseInfoList.find((element) => (element.index == this.driverClass)
+                    )
+                    if (element) {
+                        this.connectionURL = element.connectionURL
                     }
                 },
-                methods: {
-                    change() {
-                        let element = this.databaseInfoList.find((element) => (element.index == this.driverClass)
-                        )
-                        if (element) {
-                            this.connectionURL = element.connectionURL
+                next() {
+                    var id = localStorage.getItem("id") || 0
+                    this.$http.post('/database/connection', {
+                        id: id,
+                        driverClass: this.driverClass,
+                        connectionURL: this.connectionURL,
+                        username: this.username,
+                        password: this.password
+                    }).then((response) => {
+                        if (200 === response.body.status) {
+                            this.$refs.errormsg.innerText = ""
+                            this.$router.push('/schemaList')
+                            localStorage.setItem('id', response.body.data)
+                        } else {
+                            this.$refs.errormsg.innerText = response.body.data
                         }
-                    },
-                    next() {
-                        var id = localStorage.getItem("id") || 0
-                        this.$http.post('/database/connection', {
-                            id: id,
-                            driverClass: this.driverClass,
-                            connectionURL: this.connectionURL,
-                            username: this.username,
-                            password: this.password
-                        }).then((response) => {
-                            if (200 === response.body.status) {
-                                this.$refs.errormsg.innerText = ""
-                                this.$router.push('/schemaList')
-                                localStorage.setItem('id', response.body.data)
+                    })
+                }
+            },
+            created: function () {
+                this.$http.get('/database/allType').then((data) => {
+                    this.databaseInfoList = data.body.data
+                    this.change()
+                }
+                )
+            },
+        }
+        var schemaList = {
+            template: '#schemaList',
+            data: function () {
+                return {
+                    databaseList: []
+                }
+            },
+            methods: {
+                showtable(data) {
+                    this.$router.push({ path: '/table', query: { 'schemaName': data } })
+                }
+            },
+            // 注意： 这个周期函数是个函数 哈哈哈
+            created: function () {
+                this.$http.post('/database/list', { id: id }, { 'emulateJSON': true }).then((response) => {
+                    if (response.body.status == 200) {
+                        this.$refs.tips.style.display = 'none'
+                        this.$refs.tips.innerText = ''
+                        this.databaseList = response.body.data
+                    } else {
+                        this.$refs.tips.innerText = response.body.data
+                        this.$refs.tips.style.display = 'block'
+                    }
+                }
+                )
+            }
+        }
+        var tableList = {
+            template: '#tableList',
+            data: function () {
+                return {
+                    tableList: [],
+                    selectedList: [],
+                    key: ''
+                }
+            },
+            methods: {
+                select(data) {
+                    let index = this.tableList.findIndex((element) => {
+                        if (data == element.tableName)
+                            return true
+                    }
+                    )
+                    let select = this.tableList.splice(index, 1)
+                    this.selectedList.push(select[0])
+                },
+                back(data) {
+                    let index = this.selectedList.findIndex((element) => {
+                        if (data == element.tableName)
+                            return true
+                    }
+                    )
+                    let select = this.selectedList.splice(index, 1)
+                    this.tableList.push(select[0])
+                },
+                search(key) {
+                    return this.tableList.filter((element) => {
+                        if (element.tableName.includes(key)) {
+                            return true
+                        }
+                    })
+                },
+                next() {
+                    if (this.selectedList.length < 1) {
+                        this.$refs.tips.style.display = 'block'
+                        this.$refs.tips.innerText = '请指定要生成的表'
+                        return
+                    }
+                    let tableNameList = new Array()
+                    this.selectedList.forEach((element) => {
+                        tableNameList.push(element.tableName)
+                    })
+                    this.$http.post('/table/add', { id: id, schemaName: this.$route.query.schemaName, 'tableNameList': tableNameList.join(',') }, { 'emulateJSON': true }).then((response) => {
+                        if (response.body.status == 200) {
+                            this.$router.push('/config')
+                        } else {
+                            this.$refs.tips.style.display = 'block'
+                            this.$refs.tips.innerText = response.body.data
+                        }
+                    }
+                    )
+                }
+            },
+            // 注意：这里的watch是属性的，不要写成方法
+            watch: {
+                selectedList: function (val) {
+                    if (val.length > 0) {
+                        this.$refs.tips.style.display = 'none'
+                        this.$refs.tips.innerText = ''
+                    }
+                }
+            },
+            created: function () {
+                this.$http.post('/table/list', { schemaName: this.$route.query.schemaName, id: id }, { 'emulateJSON': true }).then((response) => {
+                    if (response.body.status == 200) {
+                        this.$refs.tips.innerText = ''
+                        this.$refs.tips.style.display = 'none'
+                        this.tableList = response.body.data
+                    } else {
+                        this.$refs.tips.style.display = 'block'
+                        this.$refs.tips.innerText = response.body.data
+                    }
+                })
+            }
+        }
+        var config = {
+            template: '#config',
+            data: function () {
+                return {
+                    projectList: [],
+                    show: false,
+                    newProjectName: '',
+                    error: false,
+                    projectName: '',
+                    fileList: [],
+                    basePackage: ''
+                }
+            },
+            created: function () {
+                this.getProjectList()
+            },
+            watch: {
+                projectName: function (newval, oldval) {
+                    if (newval != oldval) {
+                        this.$http.get('/config/fileList', { params: { projectName: this.projectName, basePackage: this.basePackage } }).then((response) => {
+                            if (response.body.status == 200) {
+                                this.fileList = response.body.data
                             } else {
-                                this.$refs.errormsg.innerText = response.body.data
+                                this.error = true
+                                this.$refs.tips.innerText = response.body.data
                             }
                         })
                     }
-                },
-                created: function () {
-                    this.$http.get('/database/allType').then((data) => {
-                            this.databaseInfoList = data.body.data
-                            this.change()
-                        }
-                    )
-                },
-            }
-            var schemaList = {
-                template: '#schemaList',
-                data: function () {
-                    return {
-                        databaseList: []
-                    }
-                },
-                methods: {
-                    showtable(data) {
-                        this.$router.push({path:'/table', query: { 'schemaName': data}})
-                    }
-                },
-                // 注意： 这个周期函数是个函数 哈哈哈
-                created: function () {
-                    let id = localStorage.getItem('id')
-                    this.$http.post('/database/list', {id: id}, {'emulateJSON': true}).then((response) => {
-                            if (response.body.status == 200) {
-                                this.databaseList = response.body.data
-                            }
-                        }
-                    )
                 }
-            }
-            var tableList = {template: '#tableList',
-                data: function () {
-                    return {
-                        tableList: [],
-                        selectedList: []
-                    }
+            },
+            methods: {
+                getProjectList() {
+                    this.$http.get('/config/project').then((response) => {
+                        if (response.body.status == 200) {
+                            this.projectList = response.body.data
+                        }
+                    })
                 },
-                methods: {
-                    select(data) {
-                        let index=this.tableList.findIndex((element) => {
-                            if(data==element.tableName)
-                                return true
-                            }
-                        )
-                        let select=this.tableList.splice(index,1)
-                        this.selectedList.push(select[0])
-                    },
-                    back(data) {
-                        let index=this.selectedList.findIndex((element) => {
-                                if(data==element.tableName)
-                                    return true
-                            }
-                        )
-                        let select=this.selectedList.splice(index,1)
-                        this.tableList.push(select[0])
-                    }
-
+                create() {
+                    this.show = true
                 },
-                created: function() {
-                    let id = localStorage.getItem('id')
-                    this.$http.post('/table/list', {schemaName: this.$route.query.schemaName, id: id}, {'emulateJSON': true}).then((response) => {
-                        if(response.body.status==200) {
-                            this.tableList=response.body.data
+                add() {
+                    this.$http.post('/config/addProject', { 'projectName': this.newProjectName }, { 'emulateJSON': true }).then((response) => {
+                        if (response.body.status == 200) {
+                            error = false
+                            this.getProjectList()
+                            this.show = false
+                            this.projectName = newProjectName
+                            this.newProjectName = ''
+                        } else {
+                            error = true
+                            this.$refs.tips.innerText = response.body.data
                         }
                     })
                 }
             }
-            var router = new VueRouter({
-                routes: [
-                    {path: '/', redirect: 'connectionInfo'},
-                    {path: '/connectionInfo', component: connetionInfo},
-                    {path: '/schemaList', component: schemaList},
-                    {path: '/table', component: tableList}
-                ]
-            })
-            var vm = new Vue({
-                el: '#app',
-                data: {},
-                methods: {},
-                router
-            });
-        </script>
-    </body>
+        }
+        var router = new VueRouter({
+            routes: [
+                { path: '/', redirect: 'connectionInfo' },
+                { path: '/connectionInfo', component: connetionInfo },
+                { path: '/schemaList', component: schemaList },
+                { path: '/table', component: tableList },
+                { path: '/config', component: config }
+            ]
+        })
+        var vm = new Vue({
+            el: '#app',
+            data: {},
+            methods: {},
+            router
+        });
+    </script>
+</body>
 
 </html>

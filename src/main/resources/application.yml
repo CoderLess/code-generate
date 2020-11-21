@@ -1,12 +1,13 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.0.238:3306/ibn_rms?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://8.131.95.28/lz_crm?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: root
     password: 123456
   web:
     resources:
-      static-locations: classpath:/templates/
+# 这个属性很关键，需要被访问到的静态文件必须放到这个目录下才能访问到，不然可能会出现访问不到的情况
+      static-locations: classpath:/static/
 mybatis:
   mapper-locations: classpath*:mybatis/*.xml
   configuration:

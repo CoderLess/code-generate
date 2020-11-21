@@ -1,6 +1,9 @@
 package com.ibn.generate.service;
 
+import com.ibn.generate.entity.TemplateConfigDO;
+
 import javax.sql.DataSource;
+import java.util.List;
 
 /**
  * @version 1.0
@@ -31,4 +34,44 @@ public interface CommonService {
      * @createTime：2020/11/17 11:11
      */
     DataSource queryDataSource(Long id);
+    /**
+     * @description: 设置使用哪个datasource进行链接
+     * @author：RenBin
+     * @createTime：2020/11/21 11:28
+     */
+    Boolean setDataSource(Long id);
+
+    /**
+     * @description: 设置表名
+     * @author：RenBin
+     * @createTime：2020/11/21 11:29
+     */
+    Boolean setTableNameList(Long id,String schemaName, List<String> tableNameList);
+
+    /**
+     * @description: 获取所有的项目名
+     * @author：RenBin
+     * @createTime：2020/11/21 11:56
+     */
+    List<String> queryProjectList();
+
+    /**
+     * @description: 添加新的项目
+     * @author：RenBin
+     * @createTime：2020/11/21 14:25
+     */
+    Boolean addProject(String projectName);
+    /**
+     * @description: 获取项目下面的所有文件
+     * @author：RenBin
+     * @createTime：2020/11/21 15:06
+     */
+    List<String> fileList(String projectName);
+
+    /**
+     * @description: 生成模板配置对象
+     * @author：RenBin
+     * @createTime：2020/11/21 15:36
+     */
+    List<TemplateConfigDO> generateTemplateConfig(List<String> templateNameList,String basePackage);
 }

@@ -3,7 +3,6 @@ package com.ibn.generate.controller;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.ibn.generate.common.DynamicDataSource;
 import com.ibn.generate.common.ResultInfo;
-import com.ibn.generate.cons.DataSourceCons;
 import com.ibn.generate.entity.ConnectionDO;
 import com.ibn.generate.entity.DatabaseDO;
 import com.ibn.generate.enumeration.DataBaseInfoEnum;
@@ -59,16 +58,11 @@ public class DatabaseController {
 
     @PostMapping("list")
     public ResultInfo dataBaseList(Long id) {
-        if (null == id) {
-            return new ResultInfo().error("请先设置数据库连接方式");
-        }
-        DruidDataSource dataSource = (DruidDataSource) commonService.queryDataSource(id);
-        if (null == dataSource) {
-            return new ResultInfo().error("获取数据库连接方式失败，请重新设置数据库连接方式");
+        // 修改数据源
+        if (!commonService.setDataSource(id)) {
+            return new ResultInfo().error("获取链接信息失败");
         }
 
-        DynamicDataSource.dataSourcesMap.put(DataSourceCons.DATA_SOURCE_KEY, dataSource);
-        DynamicDataSource.setDataSource(DataSourceCons.DATA_SOURCE_KEY);
         List<DatabaseDO> databaseDOList = queryService.queryDataBaseName();
         DynamicDataSource.clear();
         return new ResultInfo().success(databaseDOList);
