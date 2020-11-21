@@ -326,6 +326,7 @@
                         this.$http.get('/config/fileList', { params: { projectName: this.projectName, basePackage: this.basePackage } }).then((response) => {
                             if (response.body.status == 200) {
                                 this.fileList = response.body.data
+                                console.log(this.fileList)
                             } else {
                                 this.error = true
                                 this.$refs.tips.innerText = response.body.data

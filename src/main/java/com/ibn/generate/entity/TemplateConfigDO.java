@@ -43,7 +43,7 @@ public class TemplateConfigDO {
      * @createTime：2020/11/21 16:51
      */
     public TemplateConfigDO(String templateFileName,String basepackage) {
-        if (null != templateFileName) {
+        if (null == templateFileName) {
             return;
         }
         this.templateFileName = templateFileName;
