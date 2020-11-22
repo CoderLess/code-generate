@@ -1,6 +1,7 @@
 package com.ibn.generate.service;
 
 import com.ibn.generate.entity.TemplateConfigDO;
+import com.ibn.generate.vo.TemplateCofnigVO;
 
 import javax.sql.DataSource;
 import java.util.List;
@@ -74,4 +75,11 @@ public interface CommonService {
      * @createTime：2020/11/21 15:36
      */
     List<TemplateConfigDO> generateTemplateConfig(List<String> templateNameList,String basePackage);
+
+    /**
+     * @description: 保存模板配置信息
+     * @author：RenBin
+     * @createTime：2020/11/22 22:50
+     */
+    Boolean setTemplateConfig(TemplateCofnigVO templateCofnigVO);
 }

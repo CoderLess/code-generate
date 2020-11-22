@@ -38,6 +38,12 @@ public class TemplateConfigDO {
      */
     private String fileNameSuffix;
     /**
+     * @description: 是否需要生成
+     * @author：RenBin
+     * @createTime：2020/11/22 8:47
+     */
+    private Boolean check;
+    /**
      * @description: 构造函数
      * @author：RenBin
      * @createTime：2020/11/21 16:51
@@ -46,6 +52,7 @@ public class TemplateConfigDO {
         if (null == templateFileName) {
             return;
         }
+        this.check=true;
         this.templateFileName = templateFileName;
         this.fileNameSuffix = templateFileName.replace(".vm","");
         TemplateTypeEnum templateType = TemplateTypeEnum.getTemplateType(templateFileName);

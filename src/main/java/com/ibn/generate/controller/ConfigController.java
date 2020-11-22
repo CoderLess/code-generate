@@ -3,13 +3,11 @@ package com.ibn.generate.controller;
 import com.ibn.generate.common.ResultInfo;
 import com.ibn.generate.entity.TemplateConfigDO;
 import com.ibn.generate.service.CommonService;
+import com.ibn.generate.vo.TemplateCofnigVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -55,6 +53,13 @@ public class ConfigController {
             logger.error(msg, e);
             return new ResultInfo().error("获取文件列表失败");
         }
+    }
 
+    @PostMapping("save")
+    public ResultInfo saveTemplateConfig(@RequestBody TemplateCofnigVO templateCofnigVO) {
+        if (!commonService.setTemplateConfig(templateCofnigVO)) {
+            return new ResultInfo().error("设置配置相关信息失败");
+        }
+        return new ResultInfo().success("ok");
     }
 }

@@ -1,4 +1,4 @@
-package com.ibn.generate.entity;
+package com.ibn.generate.domain;
 
 import lombok.Data;
 
@@ -14,8 +14,9 @@ import java.util.List;
  * @createTime：2020/11/21 09:12
  */
 @Data
-public class GenrateConfigDO {
+public class GenrateConfigDTO {
     private DataSource dataSource;
     private String schemaName;
     private List<String> tableNameList;
+    private TemplateConfigDTO templateConfigDTO;
 }

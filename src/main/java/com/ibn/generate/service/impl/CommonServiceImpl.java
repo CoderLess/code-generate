@@ -5,11 +5,14 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.ibn.generate.common.DynamicDataSource;
 import com.ibn.generate.cons.DataSourceCons;
-import com.ibn.generate.entity.GenrateConfigDO;
+import com.ibn.generate.domain.GenrateConfigDTO;
+import com.ibn.generate.domain.TemplateConfigDTO;
 import com.ibn.generate.entity.TemplateConfigDO;
 import com.ibn.generate.service.CommonService;
+import com.ibn.generate.vo.TemplateCofnigVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -34,7 +37,7 @@ public class CommonServiceImpl implements CommonService {
 
     private AtomicLong atomicLong = new AtomicLong(0L);
 
-    private Map<Long, GenrateConfigDO> configMap = Maps.newConcurrentMap();
+    private Map<Long, GenrateConfigDTO> configMap = Maps.newConcurrentMap();
 
     @Override
     public Long generateId() {
@@ -43,22 +46,22 @@ public class CommonServiceImpl implements CommonService {
 
     @Override
     public Boolean saveDataSource(Long id, DataSource dataSource) {
-        GenrateConfigDO genrateConfigDO = configMap.get(id);
-        if (null == genrateConfigDO) {
-            genrateConfigDO = new GenrateConfigDO();
+        GenrateConfigDTO genrateConfigDTO = configMap.get(id);
+        if (null == genrateConfigDTO) {
+            genrateConfigDTO = new GenrateConfigDTO();
         }
-        genrateConfigDO.setDataSource(dataSource);
-        configMap.put(id, genrateConfigDO);
+        genrateConfigDTO.setDataSource(dataSource);
+        configMap.put(id, genrateConfigDTO);
         return true;
     }
 
     @Override
     public DataSource queryDataSource(Long id) {
-        GenrateConfigDO genrateConfigDO = configMap.get(id);
-        if (null == genrateConfigDO) {
+        GenrateConfigDTO genrateConfigDTO = configMap.get(id);
+        if (null == genrateConfigDTO) {
             return null;
         }
-        return genrateConfigDO.getDataSource();
+        return genrateConfigDTO.getDataSource();
     }
 
     @Override
@@ -80,12 +83,12 @@ public class CommonServiceImpl implements CommonService {
 
     @Override
     public Boolean setTableNameList(Long id, String schemaName, List<String> tableNameList) {
-        GenrateConfigDO genrateConfigDO = configMap.get(id);
-        if (null == genrateConfigDO) {
+        GenrateConfigDTO genrateConfigDTO = configMap.get(id);
+        if (null == genrateConfigDTO) {
             return false;
         }
-        genrateConfigDO.setSchemaName(schemaName);
-        genrateConfigDO.setTableNameList(tableNameList);
+        genrateConfigDTO.setSchemaName(schemaName);
+        genrateConfigDTO.setTableNameList(tableNameList);
         return true;
     }
 
@@ -142,5 +145,18 @@ public class CommonServiceImpl implements CommonService {
             templateConfigDOList.add(new TemplateConfigDO(templateName, basePackagePath));
         }
         return templateConfigDOList;
+    }
+
+    @Override
+    public Boolean setTemplateConfig(TemplateCofnigVO templateCofnigVO) {
+        Long id = templateCofnigVO.getId();
+        GenrateConfigDTO genrateConfigDTO = configMap.get(id);
+        if (null == genrateConfigDTO) {
+            return false;
+        }
+        TemplateConfigDTO templateConfigDTO = new TemplateConfigDTO();
+        BeanUtils.copyProperties(templateCofnigVO, templateConfigDTO);
+        genrateConfigDTO.setTemplateConfigDTO(templateConfigDTO);
+        return true;
     }
 }
