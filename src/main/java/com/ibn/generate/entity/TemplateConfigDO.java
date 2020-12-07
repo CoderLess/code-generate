@@ -26,7 +26,7 @@ public class TemplateConfigDO {
      */
     private String modelName;
     /**
-     * @description: 路径
+     * @description: 路径(生成文件的路径)
      * @author：RenBin
      * @createTime：2020/11/21 15:35
      */
@@ -43,6 +43,12 @@ public class TemplateConfigDO {
      * @createTime：2020/11/22 8:47
      */
     private Boolean check;
+    /**
+     * @description: 只生成一份文件
+     * @author：RenBin
+     * @createTime：2020/12/7 19:33
+     */
+    private Boolean onlyOne;
     /**
      * @description: 构造函数
      * @author：RenBin

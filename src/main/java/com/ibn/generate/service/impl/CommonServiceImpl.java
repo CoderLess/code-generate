@@ -9,6 +9,7 @@ import com.ibn.generate.domain.GenrateConfigDTO;
 import com.ibn.generate.domain.TemplateConfigDTO;
 import com.ibn.generate.entity.TemplateConfigDO;
 import com.ibn.generate.service.CommonService;
+import com.ibn.generate.util.StringUtils;
 import com.ibn.generate.vo.TemplateCofnigVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,9 @@ import org.springframework.util.CollectionUtils;
 
 import javax.sql.DataSource;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
@@ -158,5 +162,55 @@ public class CommonServiceImpl implements CommonService {
         BeanUtils.copyProperties(templateCofnigVO, templateConfigDTO);
         genrateConfigDTO.setTemplateConfigDTO(templateConfigDTO);
         return true;
+    }
+
+    @Override
+    public List<String> queryParamName(Long id) {
+        if (null == configMap) {
+            return Lists.newArrayList();
+        }
+        GenrateConfigDTO genrateConfigDTO = configMap.get(id);
+        if (null == genrateConfigDTO) {
+            return Lists.newArrayList();
+        }
+        String projectName = genrateConfigDTO.getTemplateConfigDTO().getProjectName();
+        File file = new File(projectName);
+        if (!file.exists()) {
+            this.addProject(projectName);
+            return Lists.newArrayList();
+        }
+        List<String> paramList = Lists.newArrayList();
+        File[] fileArray = file.listFiles(curFile -> curFile.isFile());
+        if (null != fileArray) {
+            for (File curFile : fileArray) {
+                try {
+                    byte[] bytes = Files.readAllBytes(Paths.get(String.format("%s%s%s",projectName,File.separator,curFile.getName())));
+                    String content = new String(bytes);
+                    List<String> regexpList = StringUtils.regexp(content, "\\$\\{custom\\.(.{1,})\\}");
+                    if (CollectionUtils.isEmpty(regexpList)) {
+                        continue;
+                    }
+                    paramList.addAll(regexpList);
+                } catch (IOException e) {
+                    String msg = String.format("读取文件信息失败：%s", curFile.getAbsolutePath());
+                    logger.error(msg, e);
+                }
+            }
+        }
+        return paramList;
+    }
+
+    @Override
+    public void setConfig(Long id, Map<String, String> params) {
+        GenrateConfigDTO genrateConfigDTO = configMap.get(id);
+        if (null == genrateConfigDTO) {
+            return;
+        }
+        genrateConfigDTO.setParams(params);
+    }
+
+    @Override
+    public GenrateConfigDTO queryConfig(Long id) {
+        return configMap.get(id);
     }
 }

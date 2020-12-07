@@ -16,12 +16,12 @@ public class ${table.entityName}DO extends BaseDO {
 
 	private static final long serialVersionUID = 1L;
 
-    #foreach($fileld in ${table.fieldDOList})
+    #foreach($fileld in ${columns})
     /**
-     * @description: $fileld.remark
+     * @description: $fileld.columnComment
      * @author：${author}
      * @createTime：${curTime}
      */
-    private $fileld.attributeType $fileld.parameterName;
+    private $fileld.type $fileld.paramName;
     #end
 }

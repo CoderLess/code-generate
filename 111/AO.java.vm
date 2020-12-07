@@ -12,8 +12,8 @@ import java.util.Set;
  * @description: ${table.remark} ao层
  * @projectName：${projectName}
  * @see: ${sysConfig.basepackage}.${velocityConfig.template.ao.outPutPackage}
- * @author： ${author}
- * @createTime：${curTime}
+ * @author： ${custom.author}
+ * @createTime：${custom.curTime}
  */
 public interface ${table.entityName}AO {
     /**

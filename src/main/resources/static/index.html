@@ -116,7 +116,7 @@
     <!--  设置配置信息 -->
     <template id="config">
         <div class="config-container">
-            <div class="alert alert-danger" ref="tips"></div>
+            <div class="alert alert-danger" ref="tips" v-show="show"></div>
             <div class="panel panel-default">
                 <div class="panel-heading">
                     模板相关参数
@@ -161,6 +161,25 @@
                                 <td><input type="text" class="form-control" v-model="item.fileNameSuffix"></td>
                             </tr>
                         </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+    <!-- 自定义配置 -->
+    <template id="custom">
+        <div class="custom-container">
+            <div class="panel panel-default">
+                <div class="alert alert-danger" ref="tips" v-show="show"></div>
+                <div class="panel-heading">自定义参数
+                    <input type="button" class="btn btn-primary" value="生成文件" @click="next">
+                </div>
+                <div class="panel-body">
+                    <div class="form-group" v-for="(item,index) in list" :key="item.key">
+                        <label for="inputEmail3" class="col-sm-2 control-label">{{item.key}}</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" v-model="item.value">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -255,8 +274,7 @@
                     let index = this.tableList.findIndex((element) => {
                         if (data == element.tableName)
                             return true
-                    }
-                    )
+                    })
                     let select = this.tableList.splice(index, 1)
                     this.selectedList.push(select[0])
                 },
@@ -264,8 +282,7 @@
                     let index = this.selectedList.findIndex((element) => {
                         if (data == element.tableName)
                             return true
-                    }
-                    )
+                    })
                     let select = this.selectedList.splice(index, 1)
                     this.tableList.push(select[0])
                 },
@@ -293,8 +310,7 @@
                             this.$refs.tips.style.display = 'block'
                             this.$refs.tips.innerText = response.body.data
                         }
-                    }
-                    )
+                    })
                 }
             },
             // 注意：这里的watch是属性的，不要写成方法
@@ -329,7 +345,7 @@
                     error: false,
                     projectName: '',
                     fileList: [],
-                    basePackage: ''
+                    basePackage: 'com.ibn'
                 }
             },
             created: function () {
@@ -341,7 +357,6 @@
                         this.$http.get('/config/fileList', { params: { projectName: this.projectName, basePackage: this.basePackage } }).then((response) => {
                             if (response.body.status == 200) {
                                 this.fileList = response.body.data
-                                console.log(this.fileList)
                             } else {
                                 this.error = true
                                 this.$refs.tips.innerText = response.body.data
@@ -376,12 +391,45 @@
                     })
                 },
                 next() {
-                    this.$http.post('/config/save', {id: id,'basePackage': this.basePackage, 'projectName': this.projectName, 'templateConfigDOList': this.fileList}).then((response)=> {
-                        if(response.body.status==200) {
+                    this.$http.post('/config/save', { id: id, 'basePackage': this.basePackage, 'projectName': this.projectName, 'templateConfigDOList': this.fileList }).then((response) => {
+                        if (response.body.status == 200) {
+                            this.$router.push('/custom')
+                        }
+                    })
+                }
+            }
+        }
+        var custom = {
+            template: '#custom',
+            data: function () {
+                return {
+                    list: [],
+                    show: false
+                }
+            },
+            methods: {
+                next() {
+                    this.$http.post('custom/config', { data: this.list, id: id }).then((response) => {
+                        if (response.body.status == 200) {
                             this.$router.push('/')
                         }
                     })
                 }
+            },
+            created: function () {
+                this.$http.get('/custom/list', { params: { id: id } }).then((response) => {
+                    if (response.body.status == 200) {
+                        for (var i = 0; i < response.body.data.length; i++) {
+                            this.list.push({
+                                value: '',
+                                key: response.body.data[i]
+                            })
+                        }
+                    } else {
+                        this.show = true
+                        this.$refs.tips.innerText = response.body.data
+                    }
+                })
             }
         }
         var router = new VueRouter({
@@ -390,7 +438,8 @@
                 { path: '/connectionInfo', component: connetionInfo },
                 { path: '/schemaList', component: schemaList },
                 { path: '/table', component: tableList },
-                { path: '/config', component: config }
+                { path: '/config', component: config },
+                { path: '/custom', component: custom }
             ]
         })
         var vm = new Vue({

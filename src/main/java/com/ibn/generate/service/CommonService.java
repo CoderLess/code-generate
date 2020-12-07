@@ -1,10 +1,12 @@
 package com.ibn.generate.service;
 
+import com.ibn.generate.domain.GenrateConfigDTO;
 import com.ibn.generate.entity.TemplateConfigDO;
 import com.ibn.generate.vo.TemplateCofnigVO;
 
 import javax.sql.DataSource;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @version 1.0
@@ -82,4 +84,25 @@ public interface CommonService {
      * @createTime：2020/11/22 22:50
      */
     Boolean setTemplateConfig(TemplateCofnigVO templateCofnigVO);
+
+    /**
+     * @description: 获取自定义参数
+     * @author：RenBin
+     * @createTime：2020/11/30 21:29
+     */
+    List<String> queryParamName(Long id);
+
+    /**
+     * @description: 设置自定义参数
+     * @author：RenBin
+     * @createTime：2020/12/1 20:15
+     */
+    void setConfig(Long id, Map<String,String> params);
+
+    /**
+     * @description: 获取配置好的参数
+     * @author：RenBin
+     * @createTime：2020/12/7 19:28
+     */
+    GenrateConfigDTO queryConfig(Long id);
 }

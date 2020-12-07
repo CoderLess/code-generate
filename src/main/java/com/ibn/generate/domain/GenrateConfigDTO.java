@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.sql.DataSource;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @version 1.0
@@ -19,4 +20,5 @@ public class GenrateConfigDTO {
     private String schemaName;
     private List<String> tableNameList;
     private TemplateConfigDTO templateConfigDTO;
+    private Map<String,String> params;
 }
