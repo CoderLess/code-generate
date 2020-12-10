@@ -10,9 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 /**
  * @version 1.0
@@ -33,15 +32,17 @@ public class CustomController {
 
     @GetMapping("list")
     public ResultInfo queryParam(Long id) {
-        List<String> paramList = commonService.queryParamName(id);
+        Set<String> paramList = commonService.queryParamName(id);
         return new ResultInfo().success(paramList);
     }
 
     @PostMapping("config")
     public ResultInfo config(@RequestBody ConsumerParam consumerParam) {
         Map<String, String> map = Maps.newHashMap();
-        if (CollectionUtils.isEmpty(consumerParam.getData())) {
-            map = consumerParam.getData().stream().collect(Collectors.toMap(KeyValueVO::getKey, KeyValueVO::getValue));
+        if (!CollectionUtils.isEmpty(consumerParam.getData())) {
+            for (KeyValueVO keyValueVO : consumerParam.getData()) {
+                map.put(keyValueVO.getKey(), keyValueVO.getValue());
+            }
         }
         commonService.setConfig(consumerParam.getId(), map);
         generateService.generate(consumerParam.getId());

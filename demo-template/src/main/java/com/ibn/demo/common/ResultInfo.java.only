@@ -1,0 +1,59 @@
+package com.ibn.demo.common;
+
+import lombok.Data;
+import org.springframework.http.HttpStatus;
+
+/**
+ * @version 1.0
+ * @description:
+ * @projectName：demo
+ * @see: com.ibn.demo.common
+ * @author： ${custom.author}
+ * @createTime：${custom.curTime}
+ */
+@Data
+public class ResultInfo {
+    /**
+     * @description: 状态码
+     * @author：${custom.author}
+     * @createTime：${custom.curTime}
+     */
+    private Integer status;
+    /**
+     * @description: 提示信息
+     * @author：${custom.author}
+     * @createTime：${custom.curTime}
+     */
+    private String message;
+    /**
+     * @description: 返回数据
+     * @author：${custom.author}
+     * @createTime：${custom.curTime}
+     */
+    private Object data;
+
+    public ResultInfo success() {
+        this.status = HttpStatus.OK.value();
+        this.message = HttpStatus.OK.getReasonPhrase();
+        return this;
+    }
+
+    public ResultInfo success(Object data) {
+        this.status = HttpStatus.OK.value();
+        this.message = HttpStatus.OK.getReasonPhrase();
+        this.data = data;
+        return this;
+    }
+
+    public ResultInfo error() {
+        this.status = HttpStatus.INTERNAL_SERVER_ERROR.value();
+        this.message = HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase();
+        return this;
+    }
+
+    public ResultInfo error(String message) {
+        this.status = HttpStatus.INTERNAL_SERVER_ERROR.value();
+        this.message = message;
+        return this;
+    }
+}

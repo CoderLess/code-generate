@@ -3,12 +3,13 @@ package com.ibn.generate.service.impl;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.ibn.generate.common.DynamicDataSource;
 import com.ibn.generate.cons.DataSourceCons;
 import com.ibn.generate.domain.GenrateConfigDTO;
 import com.ibn.generate.domain.TemplateConfigDTO;
-import com.ibn.generate.entity.TemplateConfigDO;
 import com.ibn.generate.service.CommonService;
+import com.ibn.generate.util.FileUtils;
 import com.ibn.generate.util.StringUtils;
 import com.ibn.generate.vo.TemplateCofnigVO;
 import org.slf4j.Logger;
@@ -24,6 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -139,19 +141,6 @@ public class CommonServiceImpl implements CommonService {
     }
 
     @Override
-    public List<TemplateConfigDO> generateTemplateConfig(List<String> templateNameList, String basePackage) {
-        if (CollectionUtils.isEmpty(templateNameList)) {
-            return Lists.newArrayList();
-        }
-        List<TemplateConfigDO> templateConfigDOList = Lists.newArrayList();
-        String basePackagePath = basePackage.replace(".", "/");
-        for (String templateName : templateNameList) {
-            templateConfigDOList.add(new TemplateConfigDO(templateName, basePackagePath));
-        }
-        return templateConfigDOList;
-    }
-
-    @Override
     public Boolean setTemplateConfig(TemplateCofnigVO templateCofnigVO) {
         Long id = templateCofnigVO.getId();
         GenrateConfigDTO genrateConfigDTO = configMap.get(id);
@@ -165,26 +154,27 @@ public class CommonServiceImpl implements CommonService {
     }
 
     @Override
-    public List<String> queryParamName(Long id) {
+    public Set<String> queryParamName(Long id) {
         if (null == configMap) {
-            return Lists.newArrayList();
+            return Sets.newHashSet();
         }
         GenrateConfigDTO genrateConfigDTO = configMap.get(id);
         if (null == genrateConfigDTO) {
-            return Lists.newArrayList();
+            return Sets.newHashSet();
         }
         String projectName = genrateConfigDTO.getTemplateConfigDTO().getProjectName();
         File file = new File(projectName);
         if (!file.exists()) {
             this.addProject(projectName);
-            return Lists.newArrayList();
+            return Sets.newHashSet();
         }
-        List<String> paramList = Lists.newArrayList();
-        File[] fileArray = file.listFiles(curFile -> curFile.isFile());
-        if (null != fileArray) {
-            for (File curFile : fileArray) {
+        Set<String> paramList = Sets.newHashSet();
+        List<File> fileList = Lists.newArrayList();
+        FileUtils.getFile(file, fileList);
+        if (!CollectionUtils.isEmpty(fileList)) {
+            for (File curFile : fileList) {
                 try {
-                    byte[] bytes = Files.readAllBytes(Paths.get(String.format("%s%s%s",projectName,File.separator,curFile.getName())));
+                    byte[] bytes = Files.readAllBytes(Paths.get(curFile.getAbsolutePath()));
                     String content = new String(bytes);
                     List<String> regexpList = StringUtils.regexp(content, "\\$\\{custom\\.(.{1,})\\}");
                     if (CollectionUtils.isEmpty(regexpList)) {

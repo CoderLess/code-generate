@@ -1,12 +1,12 @@
 package com.ibn.generate.service;
 
 import com.ibn.generate.domain.GenrateConfigDTO;
-import com.ibn.generate.entity.TemplateConfigDO;
 import com.ibn.generate.vo.TemplateCofnigVO;
 
 import javax.sql.DataSource;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @version 1.0
@@ -72,13 +72,6 @@ public interface CommonService {
     List<String> fileList(String projectName);
 
     /**
-     * @description: 生成模板配置对象
-     * @author：RenBin
-     * @createTime：2020/11/21 15:36
-     */
-    List<TemplateConfigDO> generateTemplateConfig(List<String> templateNameList,String basePackage);
-
-    /**
      * @description: 保存模板配置信息
      * @author：RenBin
      * @createTime：2020/11/22 22:50
@@ -90,7 +83,7 @@ public interface CommonService {
      * @author：RenBin
      * @createTime：2020/11/30 21:29
      */
-    List<String> queryParamName(Long id);
+    Set<String> queryParamName(Long id);
 
     /**
      * @description: 设置自定义参数

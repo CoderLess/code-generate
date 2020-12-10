@@ -16,7 +16,7 @@ public class ParamConsts {
     // 模板文件中获取所有变量名
     public static final String PARAM_NAME_LIST = "paramNameList";
     // 模板文件中获取用户自定义的参数名
-    public static final String CONSUMER = "consumer";
+    public static final String CONSUMER = "custom";
     // 模板文件中获取当前类名
     public static final String CLASS_NAME = "className";
     // 模板文件中获取当前变量名

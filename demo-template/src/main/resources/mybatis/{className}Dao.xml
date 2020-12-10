@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ibn.demo.dao.${className}Dao">
+	<sql id="${className}DO_Columns">
+		<trim suffixOverrides=",">
+			#foreach($fileld in ${columns})
+				<if test="$fileld.paramName != null">$fileld.columnName,</if>
+			#end
+		</trim>
+	</sql>
+
+	<sql id="${className}DO_Values">
+		<trim suffixOverrides=",">
+			#foreach($fileld in ${columns})
+				<if test="$fileld.paramName != null">#{ $fileld.paramName },</if>
+			#end
+		</trim>
+	</sql>
+
+	<sql id="baseColumn">
+		#foreach($fileld in ${columns})
+			#if($foreach.hasNext)
+				`$fileld.columnName`,
+			#else
+				`$fileld.columnName`
+			#end
+		#end
+	</sql>
+
+	<insert id="save" useGeneratedKeys="true" keyProperty="id">
+		insert into ${tableName} (<include refid="${className}DO_Columns"/>)
+		values(<include refid="${className}DO_Values"/>)
+	</insert>
+
+	<insert id="saveBatch" parameterType="java.util.List">
+		insert into ${tableName} ( <include refid="baseColumn"/>)
+		values
+		<foreach collection="list" index="index" item="item" separator=",">
+			(
+			#foreach($fileld in ${columns})
+				#if($foreach.hasNext)
+					#{ item.$fileld.paramName },
+				#else
+					#{ item.$fileld.paramName }
+				#end
+			#end
+			)
+		</foreach>
+	</insert>
+	<update id="updateById">
+		update ${tableName}
+		<set>
+			#foreach($fileld in ${columns})
+				<if test="$fileld.paramName != null">`$fileld.columnName` = #{$fileld.paramName},</if>
+			#end
+		</set>
+		where id = #{id}
+	</update>
+
+	<delete id="deleteById">
+		delete from ${tableName} where id = #{id}
+	</delete>
+
+	<select id="queryById" resultType="com.ibn.demo.entity.${className}DO">
+		select
+		<include refid="baseColumn"/>
+		from ${tableName} where id = #{id}
+	</select>
+
+	<sql id="queryColumn">
+		<where>
+			#foreach($fileld in ${columns})
+				<if test="$fileld.paramName != null">
+					and $fileld.columnName = #{$fileld.paramName}
+				</if>
+			#end
+		</where>
+	</sql>
+
+	<select id="queryList" resultType="com.ibn.demo.entity.${className}DO">
+		select
+		<include refid="baseColumn"/>
+		from ${tableName} <include refid="queryColumn"/>
+	</select>
+</mapper>

@@ -124,11 +124,6 @@
                 </div>
                 <div class="panel-body">
                     <div v-show="error" class="alert alert-danger" ref="tips"></div>
-                    <!-- 包基础路径 -->
-                    <div id="form-group form-inline">
-                        <label class="control-label">基础包路径</label>
-                        <input type="text" v-model="basePackage">
-                    </div>
                     <!-- 项目名称相关操作 -->
                     <div class="form-group form-inline">
                         <label class="control-label">项目名称：</label>
@@ -141,26 +136,6 @@
                             <input type="button" class="btn btn-primary" value="添加" @click="add">
                             <input type="button" class="btn btn-primary" value="取消" @click="show=false">
                         </div>
-                    </div>
-                    <!-- 项目中的所有文件设置 -->
-                    <div id="form-group form-inline">
-                        <label class="control-label">模板设置：</label>
-                        <table class="table table-striped">
-                            <tr>
-                                <th>是否生成</th>
-                                <th>模板文件名称</th>
-                                <th>java项目名</th>
-                                <th>生成文件路径</th>
-                                <th>文件名后缀</th>
-                            </tr>
-                            <tr v-for="item in fileList">
-                                <td><input type="checkbox" v-model="item.check"></td>
-                                <td>{{item.templateFileName}}</td>
-                                <td><input type="text" class="form-control" v-model="item.modelName"></td>
-                                <td><input type="text" class="form-control" v-model="item.path"></td>
-                                <td><input type="text" class="form-control" v-model="item.fileNameSuffix"></td>
-                            </tr>
-                        </table>
                     </div>
                 </div>
             </div>
@@ -343,27 +318,11 @@
                     show: false,
                     newProjectName: '',
                     error: false,
-                    projectName: '',
-                    fileList: [],
-                    basePackage: 'com.ibn'
+                    projectName: ''
                 }
             },
             created: function () {
                 this.getProjectList()
-            },
-            watch: {
-                projectName: function (newval, oldval) {
-                    if (newval != oldval) {
-                        this.$http.get('/config/fileList', { params: { projectName: this.projectName, basePackage: this.basePackage } }).then((response) => {
-                            if (response.body.status == 200) {
-                                this.fileList = response.body.data
-                            } else {
-                                this.error = true
-                                this.$refs.tips.innerText = response.body.data
-                            }
-                        })
-                    }
-                }
             },
             methods: {
                 getProjectList() {
@@ -391,7 +350,7 @@
                     })
                 },
                 next() {
-                    this.$http.post('/config/save', { id: id, 'basePackage': this.basePackage, 'projectName': this.projectName, 'templateConfigDOList': this.fileList }).then((response) => {
+                    this.$http.post('/config/save', { id: id, 'projectName': this.projectName }).then((response) => {
                         if (response.body.status == 200) {
                             this.$router.push('/custom')
                         }

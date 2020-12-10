@@ -1,7 +1,6 @@
 package com.ibn.generate.controller;
 
 import com.ibn.generate.common.ResultInfo;
-import com.ibn.generate.entity.TemplateConfigDO;
 import com.ibn.generate.service.CommonService;
 import com.ibn.generate.vo.TemplateCofnigVO;
 import org.slf4j.Logger;
@@ -40,19 +39,6 @@ public class ConfigController {
             return new ResultInfo().success("添加成功");
         }
         return new ResultInfo().error("添加失败");
-    }
-
-    @GetMapping("fileList")
-    public ResultInfo fileList(String projectName,String basePackage) {
-        try {
-            List<String> fileNameList = commonService.fileList(projectName);
-            List<TemplateConfigDO> templateConfigDOList = commonService.generateTemplateConfig(fileNameList, basePackage);
-            return new ResultInfo().success(templateConfigDOList);
-        } catch (Exception e) {
-            String msg = String.format("获取文件列表时出现异常，projectName:%s", projectName);
-            logger.error(msg, e);
-            return new ResultInfo().error("获取文件列表失败");
-        }
     }
 
     @PostMapping("save")

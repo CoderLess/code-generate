@@ -1,0 +1,51 @@
+package com.ibn.demo.dao;
+
+import java.util.List;
+
+/**
+ * @version 1.0
+ * @description:
+ * @projectName：demo
+ * @see: com.ibn.demo.dao
+ * @author： ${custom.author}
+ * @createTime：${custom.curTime}
+ */
+public interface BaseDao<T> {
+    /**
+     * @description: 保存数据
+     * @author：${custom.author}
+     * @createTime：${custom.curTime}
+     */
+    Long save(T t);
+    /**
+     * @description: 批量保存数据
+     * @author：${custom.author}
+     * @createTime：${custom.curTime}
+     */
+    Long saveBatch(List<T> list);
+    /**
+     * @description: 通过id更新数据
+     * @author：${custom.author}
+     * @createTime：${custom.curTime}
+     */
+    Integer updateById(T t);
+    /**
+     * @description: 根据id删除数据
+     * @author：${custom.author}
+     * @createTime：${custom.curTime}
+     */
+    Integer deleteById(Long id);
+    /**
+     * @description: 通过id查询数据
+     * @author：${custom.author}
+     * @createTime：${custom.curTime}
+     */
+    T queryById(Long id);
+    /**
+     * @description: 通过条件查询数据
+     * @author：${custom.author}
+     * @createTime：${custom.curTime}
+     */
+    List<T> queryList(T t);
+
+}

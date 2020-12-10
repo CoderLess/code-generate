@@ -2,16 +2,16 @@ package com.ibn.generate.service.impl;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.ibn.generate.constant.FileConsts;
 import com.ibn.generate.constant.ParamConsts;
 import com.ibn.generate.dao.MysqlQueryDao;
 import com.ibn.generate.domain.GenrateConfigDTO;
-import com.ibn.generate.domain.TemplateConfigDTO;
 import com.ibn.generate.entity.ColumnDO;
 import com.ibn.generate.entity.TableDO;
-import com.ibn.generate.entity.TemplateConfigDO;
 import com.ibn.generate.service.CommonService;
 import com.ibn.generate.service.GenerateService;
 import com.ibn.generate.service.TemplateService;
+import com.ibn.generate.util.FileUtils;
 import com.ibn.generate.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,43 +44,53 @@ public class GenerateServiceImpl implements GenerateService {
         if (null == genrateConfigDTO) {
             return false;
         }
-        String destProjectName = String.valueOf(System.currentTimeMillis());
+        String projectName = genrateConfigDTO.getTemplateConfigDTO().getProjectName();
+        // 生成目标文件目录
+        String destProjectName = String.format("%s-%d",projectName.replace(FileConsts.TEMPLATE,""),System.currentTimeMillis());
 
-        TemplateConfigDTO templateConfigDTO = genrateConfigDTO.getTemplateConfigDTO();
-        List<TemplateConfigDO> templateConfigDOList = templateConfigDTO.getTemplateConfigDOList();
         // 处理与表名相关的参数
         Map<String, Object> param = this.contractAllParam(genrateConfigDTO);
         // 遍历所有模板
-        for (TemplateConfigDO templateConfigDO : templateConfigDOList) {
-            // 遍历所有表
-            this.generateFile(destProjectName,templateConfigDTO.getProjectName(),genrateConfigDTO.getTableNameList(),genrateConfigDTO,templateConfigDO,param);
+        List<String> fileList = Lists.newArrayList();
+        FileUtils.getFilePath(projectName,"", fileList);
+        if (CollectionUtils.isEmpty(fileList)) {
+            return false;
         }
+        for (String curFile : fileList) {
+            String destFilePath = curFile.replaceFirst(projectName, destProjectName);
+            // 遍历所有表
+            this.generateFile(curFile,destFilePath,genrateConfigDTO.getTableNameList(),
+                    genrateConfigDTO,param);
+        }
+
         return true;
     }
+
 
     /**
      * @description: 遍历所有表并生成文件
      * @author：RenBin
      * @createTime：2020/12/7 20:18
      */
-    private Boolean generateFile(String destProjectName,String projectName,List<String> tableNameList ,GenrateConfigDTO genrateConfigDTO,TemplateConfigDO templateConfigDO, Map<String, Object> param) {
-        String templatePath;
-        String destPath;
-        templatePath = String.format("%s/%s", projectName, templateConfigDO.getTemplateFileName());
-        destPath = String.format("%s/%s/%s/%s", projectName,destProjectName, templateConfigDO.getModelName(), templateConfigDO.getPath());
-
-        if (Boolean.TRUE.equals(templateConfigDO.getOnlyOne())) {
+    private Boolean generateFile(String templatePath,String destPath,List<String> tableNameList ,
+                                 GenrateConfigDTO genrateConfigDTO, Map<String, Object> param) {
+        if (templatePath.endsWith(FileConsts.ONLY)) {
+            destPath = destPath.replace(FileConsts.ONLY, "");
             templateService.writer(templatePath, destPath, param);
             return true;
         }
-        String className;
         TableDO tableDO;
         for (String tableName : tableNameList) {
-            className = curTableNameParam(param, tableName);
-            destPath = String.format("%s/%s%s",destPath,className,templateConfigDO.getFileNameSuffix());
             tableDO=new TableDO();
             tableDO.setTableSchema(genrateConfigDTO.getSchemaName());
             tableDO.setTableName(tableName);
+            String className = this.curTableNameParam(param, tableName);
+            if (destPath.contains(FileConsts.CLASS_NAME)) {
+                destPath = destPath.replace(FileConsts.CLASS_NAME, className);
+            }
+            if (destPath.contains(FileConsts.CLASS_NAME)) {
+                destPath = destPath.replace(FileConsts.CLASS_NAME, className);
+            }
             TableDO tableInfoDO = mysqlQueryDao.queryTableInfo(tableDO);
             this.tableInfoParam(param, tableInfoDO);
             List<ColumnDO> columnDOList = mysqlQueryDao.queryColumnInfo(tableDO);
